@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
 import 'colors.dart';
 import 'data_fetcher_service.dart';
@@ -32,14 +33,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final customTheme = ThemeData(
+      scaffoldBackgroundColor: AppColors.backgroundColor,
+    );
+
     return ChangeNotifierProvider.value(
       value: context.read<MyAppState>(),
       child: SafeArea(
         child: MaterialApp(
           title: 'Joke Generator',
-          theme: ThemeData(
-            primaryColor: AppColors.primaryColor,
-          ),
+          theme: customTheme,
           home: BottomNavBar(),
         ),
       ),
@@ -111,8 +114,9 @@ class BottomNavBarState extends State<BottomNavBar> {
           });
         },
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.black,
-        unselectedItemColor: Colors.white,
+        backgroundColor: AppColors.primaryColor,
+        unselectedItemColor: AppColors.lightColor,
+        selectedItemColor: AppColors.secondaryColor,
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -146,10 +150,10 @@ class HomePage extends StatelessWidget {
     // Define a custom ButtonStyle for the buttons on HomePage
     final ButtonStyle customButtonStyle = ButtonStyle(
       backgroundColor: MaterialStateProperty.all(
-        Theme.of(context).colorScheme.primary,
+        AppColors.primaryColor,
       ),
       foregroundColor: MaterialStateProperty.all(
-        Theme.of(context).colorScheme.onPrimary,
+        AppColors.secondaryColor,
       ),
       fixedSize: MaterialStateProperty.all(
         Size(150, 50),
@@ -221,6 +225,7 @@ class FavoritesPage extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
+              color: AppColors.lightColor,
             ),
             'Saved Generated Words:',
           ),
@@ -251,17 +256,18 @@ class BigCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final style = TextStyle(
-      fontSize: 24,
-      color: theme.colorScheme.primary,
-      fontWeight: FontWeight.bold,
+    final style = GoogleFonts.poppins(
+      textStyle: TextStyle(
+        fontSize: 24,
+        color: AppColors.backgroundColor,
+        fontWeight: FontWeight.bold,
+      ),
     );
 
     return Column(
       children: [
         Card(
-          color: theme.colorScheme.onPrimary,
+          color: AppColors.lightColor,
           child: Padding(
             padding: const EdgeInsets.all(10),
             child: Text(
@@ -271,7 +277,7 @@ class BigCard extends StatelessWidget {
           ),
         ),
         Card(
-          color: theme.colorScheme.onPrimary,
+          color: AppColors.lightColor,
           child: Padding(
             padding: const EdgeInsets.all(10),
             child: Text(
@@ -296,11 +302,16 @@ class SmallCard extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var joke = '$setup\n$delivery';
+
     return Card(
+      color: AppColors.lightColor,
       child: ListTile(
         title: Text(
           joke,
-          style: TextStyle(fontSize: 16),
+          style: TextStyle(
+              fontSize: 16,
+              color: AppColors.backgroundColor,
+              fontWeight: FontWeight.bold),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -310,12 +321,14 @@ class SmallCard extends StatelessWidget {
               onPressed: () {
                 _copyToClipboard(joke, context);
               },
+              color: AppColors.backgroundColor,
             ),
             IconButton(
               icon: Icon(Icons.delete),
               onPressed: () {
                 appState.toggleFavorite(setup, delivery);
               },
+              color: AppColors.backgroundColor,
             ),
           ],
         ),

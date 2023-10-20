@@ -1,4 +1,9 @@
 # Joke-Generator
+
+## Link
+https://jokegenerator-ap.vercel.app <br/>
+Pay attention! this project was designed to be mobile application, yet still suitable on multiple platforms and devices.
+
 ## Description
 Generate random amount of jokes using an app made in flutter, choose your categories of jokes and save them to your own favorite page.
 
@@ -7,12 +12,17 @@ Generate random amount of jokes using an app made in flutter, choose your catego
 - Save jokes in a list to a local storage.
 - Copy to clipboard and delete your saved jokes from saved list.
 
+## Pictures
+<div>
+ <img src="https://github.com/ItsAlexanderPopov/Joke-Generator/blob/main/images/homepageScreenshot.jpg" alt="Home Page" width="250" height='450'/>
+ <img src="https://github.com/ItsAlexanderPopov/Joke-Generator/blob/main/images/favoritesScreenshot.jpg" alt="Favorites Page" width="250" height='450'/>
+</div>
+
 ## Road map
- The state is still unfinished, this is my personal roadmap until I finish my App project
  * [x] Create functional generator.
  * [x] Add Save option and favorites page.
  * [x] Fetch data from JokeAPI.
- * [x] Create local storage to save favorites array.
+ * [x] Create local storage to save favorites list.
  * [ ] Add joke categories feature.
        
 ## Technology Used

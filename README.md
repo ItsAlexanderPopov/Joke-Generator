@@ -3,7 +3,7 @@
 Generate random amount of jokes using an app made in flutter, choose your categories of jokes and save them to your own favorite page.
 
 ## Main Features
-- Generate jokes using JokeAPI.
+- Generate jokes using JokeAPI. (source: https://sv443.net/jokeapi/v2/)
 - Save jokes in a list to a local storage.
 - Copy to clipboard and delete your saved jokes from saved list.
 

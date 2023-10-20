@@ -8,7 +8,9 @@ import 'colors.dart';
 import 'data_fetcher_service.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   final appState = MyAppState();
+  await SharedPreferences.getInstance();
   await appState.loadFavorites();
 
   final dataService = DataService(
@@ -57,22 +59,18 @@ class MyAppState extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final favoritesJson = favorites.map((fav) => fav).toList();
     await prefs.setString('favorites', jsonEncode(favoritesJson));
-    print('Favorites saved: $favoritesJson');
   }
 
   Future<void> loadFavorites() async {
     favorites = <Map<String, String>>[];
     final prefs = await SharedPreferences.getInstance();
     final favoritesJson = prefs.getString('favorites');
-    print('favoritesJson loaded: $favoritesJson');
     if (favoritesJson != null) {
       final favoritesList = (jsonDecode(favoritesJson) as List?);
-      print('favoritesList loaded: $favoritesList');
       if (favoritesList != null) {
         favorites = favoritesList.map((item) {
           return Map<String, String>.from(item);
         }).toList();
-        print('favorites loaded: $favorites');
       }
     }
     notifyListeners();
@@ -174,7 +172,7 @@ class HomePage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          SizedBox(height: 100),
+          SizedBox(height: 50),
           BigCard(
             setup: dataService.setup.toString(),
             delivery: dataService.delivery.toString(),
@@ -200,9 +198,9 @@ class HomePage extends StatelessWidget {
                 style: customButtonStyle,
                 child: Text('Generate'),
               ),
+              SizedBox(height: 100),
             ],
           ),
-          SizedBox(height: 100),
         ],
       ),
     );
@@ -214,7 +212,6 @@ class FavoritesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var favoriteWords = appState.favorites;
-    print('Number of favoriteWords: ${favoriteWords.length}');
     return ListView(
       children: [
         SizedBox(
@@ -227,7 +224,7 @@ class FavoritesPage extends StatelessWidget {
               fontSize: 18,
               color: AppColors.lightColor,
             ),
-            'Saved Generated Words:',
+            'Favorite Jokes:',
           ),
         ),
         SizedBox(
@@ -301,17 +298,21 @@ class SmallCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    var joke = '$setup\n$delivery';
+    var joke = '$setup\n\n$delivery';
+    final style = GoogleFonts.poppins(
+      textStyle: TextStyle(
+        fontSize: 14,
+        color: AppColors.backgroundColor,
+        fontWeight: FontWeight.bold,
+      ),
+    );
 
     return Card(
       color: AppColors.lightColor,
       child: ListTile(
         title: Text(
           joke,
-          style: TextStyle(
-              fontSize: 16,
-              color: AppColors.backgroundColor,
-              fontWeight: FontWeight.bold),
+          style: style,
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

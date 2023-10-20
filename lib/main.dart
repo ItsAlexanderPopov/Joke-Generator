@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'colors.dart';
 import 'data_fetcher_service.dart';
 
-void main() {
+void main() async {
+  final appState = MyAppState();
+  await appState.loadFavorites();
+
   final dataService = DataService(
     'https://v2.jokeapi.dev/joke/Programming,Pun,Spooky,Christmas?blacklistFlags=nsfw,political,racist,sexist,explicit&type=twopart',
   );
 
   dataService.fetchData().then((_) {
     runApp(
-      ChangeNotifierProvider(
-        create: (context) => dataService,
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => appState),
+          ChangeNotifierProvider(create: (_) => dataService),
+        ],
         child: const MyApp(),
       ),
     );
@@ -23,13 +32,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
+    return ChangeNotifierProvider.value(
+      value: context.read<MyAppState>(),
       child: SafeArea(
         child: MaterialApp(
           title: 'Joke Generator',
           theme: ThemeData(
-            primarySwatch: Colors.yellow,
+            primaryColor: AppColors.primaryColor,
           ),
           home: BottomNavBar(),
         ),
@@ -40,6 +49,31 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   var favorites = <Map<String, String>>[];
+
+  Future<void> saveFavorites() async {
+    final prefs = await SharedPreferences.getInstance();
+    final favoritesJson = favorites.map((fav) => fav).toList();
+    await prefs.setString('favorites', jsonEncode(favoritesJson));
+    print('Favorites saved: $favoritesJson');
+  }
+
+  Future<void> loadFavorites() async {
+    favorites = <Map<String, String>>[];
+    final prefs = await SharedPreferences.getInstance();
+    final favoritesJson = prefs.getString('favorites');
+    print('favoritesJson loaded: $favoritesJson');
+    if (favoritesJson != null) {
+      final favoritesList = (jsonDecode(favoritesJson) as List?);
+      print('favoritesList loaded: $favoritesList');
+      if (favoritesList != null) {
+        favorites = favoritesList.map((item) {
+          return Map<String, String>.from(item);
+        }).toList();
+        print('favorites loaded: $favorites');
+      }
+    }
+    notifyListeners();
+  }
 
   void toggleFavorite(String? setup, String? delivery) {
     // Check if any map in favorites has the same "setup" value
@@ -53,6 +87,7 @@ class MyAppState extends ChangeNotifier {
       favorites.add({'setup': setup ?? '', 'delivery': delivery ?? ''});
     }
     notifyListeners();
+    saveFavorites();
   }
 }
 
@@ -133,8 +168,9 @@ class HomePage extends StatelessWidget {
 
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          SizedBox(height: 100),
           BigCard(
             setup: dataService.setup.toString(),
             delivery: dataService.delivery.toString(),
@@ -162,6 +198,7 @@ class HomePage extends StatelessWidget {
               ),
             ],
           ),
+          SizedBox(height: 100),
         ],
       ),
     );
@@ -173,11 +210,11 @@ class FavoritesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var favoriteWords = appState.favorites;
-
+    print('Number of favoriteWords: ${favoriteWords.length}');
     return ListView(
       children: [
         SizedBox(
-          height: 10,
+          height: 20,
         ),
         Center(
           child: Text(
@@ -187,6 +224,9 @@ class FavoritesPage extends StatelessWidget {
             ),
             'Saved Generated Words:',
           ),
+        ),
+        SizedBox(
+          height: 20,
         ),
         for (var fav in favoriteWords)
           SmallCard(
